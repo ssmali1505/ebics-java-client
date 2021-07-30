@@ -41,6 +41,8 @@ import org.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests.Encryption;
 import org.ebics.schema.h005.StaticHeaderType.Product;
 
 import javax.crypto.spec.SecretKeySpec;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -155,6 +157,9 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     encryptionPubKeyDigest = EbicsXmlFactory.createEncryptionPubKeyDigest(session.getConfiguration().getEncryptionVersion(),
 								          "http://www.w3.org/2001/04/xmlenc#sha256",
 								          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
+   String str = new String(userSignature.prettyPrint(), StandardCharsets.UTF_8);
+    System.out.println("userSignature: " + str);
+    
     signatureData = EbicsXmlFactory.createSignatureData(true, Utils.encrypt(Utils.zip(userSignature.prettyPrint()), keySpec));
     dataEncryptionInfo = EbicsXmlFactory.createDataEncryptionInfo(true,
 	                                                          encryptionPubKeyDigest,
@@ -169,7 +174,8 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/h005", "");
-
+    setSaveSuggestedPrefixes("http://www.w3.org/2000/09/xmldsig#", "ds");
+    setSaveSuggestedPrefixes("urn:org:ebics:H005", "");
     return super.toByteArray();
   }
 

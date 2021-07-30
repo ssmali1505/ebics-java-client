@@ -24,133 +24,153 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 
-
 /**
- * Some IO utilities for EBICS files management.
- * EBICS server
+ * Some IO utilities for EBICS files management. EBICS server
  *
  * @author hachani
  *
  */
 public class IOUtils {
 
-  /**
-   * Creates a directory from a root one
-   * @param parent the parent directory
-   * @param child the directory name
-   * @return The created directory
-   */
-  public static File createDirectory(File parent, String child) {
-    File			directory;
+	/**
+	 * Creates a directory from a root one
+	 * 
+	 * @param parent the parent directory
+	 * @param child  the directory name
+	 * @return The created directory
+	 */
+	public static File createDirectory(File parent, String child) {
+		File directory;
 
-    directory = new File(parent, child);
-    directory.mkdir();
+		directory = new File(parent, child);
+		directory.mkdir();
 
-    return directory;
-  }
+		return directory;
+	}
 
-  /**
-   * Creates a directory from a root one
-   * @param parent the parent directory
-   * @param child the directory name
-   * @return The created directory
-   */
-  public static File createDirectory(String parent, String child) {
-    File			directory;
+	/**
+	 * Creates a directory from a root one
+	 * 
+	 * @param parent the parent directory
+	 * @param child  the directory name
+	 * @return The created directory
+	 */
+	public static File createDirectory(String parent, String child) {
+		File directory;
 
-    directory = new File(parent, child);
-    directory.mkdir();
+		directory = new File(parent, child);
+		directory.mkdir();
 
-    return directory;
-  }
+		return directory;
+	}
 
-  /**
-   * Creates a directory from a directory name
-   * @param name the absolute directory name
-   * @return The created directory
-   */
-  public static File createDirectory(String name) {
-    File			directory;
+	/**
+	 * Creates a directory from a directory name
+	 * 
+	 * @param name the absolute directory name
+	 * @return The created directory
+	 */
+	public static File createDirectory(String name) {
+		File directory;
 
-    directory = new File(name);
-    directory.mkdir();
+		directory = new File(name);
+		directory.mkdir();
 
-    return directory;
-  }
+		return directory;
+	}
 
-  /**
-   * Creates many directories from a given full path.
-   * Path should use default separator like '/' for UNIX
-   * systems
-   * @param fullName the full absolute path of the directories
-   * @return The created directory
-   */
-  public static File createDirectories(String fullName) {
-    File			directory;
+	/**
+	 * Creates many directories from a given full path. Path should use default
+	 * separator like '/' for UNIX systems
+	 * 
+	 * @param fullName the full absolute path of the directories
+	 * @return The created directory
+	 */
+	public static File createDirectories(String fullName) {
+		File directory;
 
-    directory = new File(fullName);
-    directory.mkdirs();
+		directory = new File(fullName);
+		directory.mkdirs();
 
-    return directory;
-  }
+		return directory;
+	}
 
-  /**
-   * Creates a new <code>java.io.File</code> from a given root.
-   * @param parent the parent of the file.
-   * @param name the file name.
-   * @return the created file.
-   */
-  public static File createFile(File parent, String name) {
-    File			file;
+	/**
+	 * Creates a new <code>java.io.File</code> from a given root.
+	 * 
+	 * @param parent the parent of the file.
+	 * @param name   the file name.
+	 * @return the created file.
+	 */
+	public static File createFile(File parent, String name) {
+		File file;
 
-    file = new File(parent, name);
+		file = new File(parent, name);
 
-    return file;
-  }
+		return file;
+	}
 
+	/**
+	 * Returns the content of a file as byte array.
+	 * 
+	 * @param file the file
+	 * @return the byte array content of the file
+	 * @throws EbicsException
+	 */
+	public static byte[] getFileContent(File file) throws EbicsException {
+		try {
+			try (FileInputStream input = new FileInputStream(file)) {
+				return inputStreamToBytes(input);
+			}
+		} catch (IOException e) {
+			throw new EbicsException(e.getMessage());
+		}
+	}
 
-  /**
-   * Returns the content of a file as byte array.
-   * @param file the file
-   * @return the byte array content of the file
-   * @throws EbicsException
-   */
-  public static byte[] getFileContent(File file) throws EbicsException {
-    try {
-      try(FileInputStream input = new FileInputStream(file)) {
-          return inputStreamToBytes(input);
-      }
-    } catch (IOException e) {
-      throw new EbicsException(e.getMessage());
-    }
-  }
+	/**
+	 * Returns the content of a <code>ContentFactory</code> as a byte array
+	 * 
+	 * @param content
+	 * @return
+	 * @throws EbicsException
+	 */
+	public static byte[] getFactoryContent(ContentFactory content) throws EbicsException {
+		try (InputStream in = content.getContent()) {
+			return inputStreamToBytes(in);
+		} catch (IOException e) {
+			throw new EbicsException(e.getMessage());
+		}
+	}
 
-  /**
-   * Returns the content of a <code>ContentFactory</code> as a byte array
-   * @param content
-   * @return
-   * @throws EbicsException
-   */
-    public static byte[] getFactoryContent(ContentFactory content) throws EbicsException {
-        try (InputStream in = content.getContent()) {
-            return inputStreamToBytes(in);
-        } catch (IOException e) {
-            throw new EbicsException(e.getMessage());
-        }
-    }
+	private static byte[] inputStreamToBytes(InputStream in) throws IOException {
+		int len;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		while ((len = in.read(buffer)) != -1) {
+			out.write(buffer, 0, len);
+		}
+		out.close();
+		return out.toByteArray();
+	}
 
-    private static byte[] inputStreamToBytes(InputStream in) throws IOException {
-        int len;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        while ((len = in.read(buffer)) != -1) {
-            out.write(buffer, 0, len);
-        }
-        out.close();
-        return out.toByteArray();
-    }
+	public static String toString(InputStream content) {
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		try {
+			for (int length; (length = content.read(buffer)) != -1;) {
+				result.write(buffer, 0, length);
+			}
+			return result.toString("UTF-8");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

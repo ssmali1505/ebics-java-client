@@ -86,7 +86,8 @@ public class UserSignature extends DefaultEbicsRootElement {
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/S002", "");
-
+    setSaveSuggestedPrefixes("http://www.w3.org/2000/09/xmldsig#", "ds");
+    setSaveSuggestedPrefixes("urn:org:ebics:H005", "");
     return super.toByteArray();
   }
 

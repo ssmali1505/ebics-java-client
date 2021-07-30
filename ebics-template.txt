@@ -17,3 +17,4 @@ user.org=
 languageCode=de
 countryCode=DE
 productName=EBICS Java Kernel 1.0
+overrideNameSpace={"http://www.ebics.org/S002":"","http://www.w3.org/2000/09/xmldsig#":"ds","urn:org:ebics:H005":"","urn:org:ebics:H004":"","http://www.ebics.org/H003":""}

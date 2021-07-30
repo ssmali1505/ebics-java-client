@@ -22,6 +22,7 @@ package org.ebics.client.api;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -46,6 +47,7 @@ import org.apache.http.util.EntityUtils;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.interfaces.Configuration;
 import org.ebics.client.io.ByteArrayContentFactory;
+import org.ebics.client.io.IOUtils;
 import org.ebics.client.session.EbicsSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +61,7 @@ public class HttpRequestSender {
     private static Logger logger = LoggerFactory.getLogger(HttpRequestSender.class);
     private final EbicsSession session;
     private ContentFactory response;
+    private String  responseAsString;
 
     /**
      * Constructs a new <code>HttpRequestSender</code> with a given ebics
@@ -131,8 +134,9 @@ public class HttpRequestSender {
         method.setHeader(HttpHeaders.CONTENT_TYPE, "text/xml; charset=ISO-8859-1");
 
         try (CloseableHttpResponse response = httpClient.execute(method)) {
-            this.response = new ByteArrayContentFactory(
-                EntityUtils.toByteArray(response.getEntity()));
+        	byte[] data= EntityUtils.toByteArray(response.getEntity());
+            this.response = new ByteArrayContentFactory(data);
+            this.responseAsString = IOUtils.toString(this.response.getContent());
             return response.getStatusLine().getStatusCode();
         }
     }
@@ -145,4 +149,14 @@ public class HttpRequestSender {
     public ContentFactory getResponseBody() {
         return response;
     }
+
+	public String getResponseAsString() {
+		return responseAsString;
+	}
+
+	public void setResponseAsString(String responseAsString) {
+		this.responseAsString = responseAsString;
+	}
+    
+    
 }
