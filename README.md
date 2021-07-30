@@ -1,7 +1,7 @@
 EBICS Java Client
 =====
 
-Fork of the Java open source EBICS client project - https://github.com/uwemaurer/ebics-java-client/
+Fork of the Java open source EBICS client project - https://github.com/honza-toegel/ebics-java-client
 
 How to get started:
 
